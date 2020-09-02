@@ -1,7 +1,7 @@
 # Trivia Django Pilot App
 
 Create python3.6.* environment compatible with Django 3.1 
-    $ virtualenv --python=/usr/bin/python3 env
+    `$ virtualenv --python=/usr/bin/python3 env`
 
 # Clon the repository
     $ git clon https://github.com/JackPrajapati/trivia_app.git

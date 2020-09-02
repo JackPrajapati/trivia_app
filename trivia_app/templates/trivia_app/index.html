@@ -1,0 +1,125 @@
+{% extends 'trivia_app/base.html' %}
+
+{% block css %}
+ <!-- splash screen css -->
+  <style type="text/css">
+    body {
+  margin: 0;
+  padding: 0;
+}
+
+.cover {
+  background: #3bbbad;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: fade-out 4s /*infinite*/;
+  z-index: 10
+}
+
+.cover #icon {
+  --size: 100px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: var(--size);
+  
+  animation: zoom-in 2s /*infinite*/;
+  animation-delay: 2s;
+}
+
+@keyframes zoom-in {
+  50% {
+    width: var(--size);
+  }
+  60% {
+    width: calc(var(--size) * 0.9);
+  }
+  100% {
+    width: 250%;
+  }
+}
+@keyframes fade-out {
+  0%, 85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.content {
+  width: 100%;
+}
+  </style>
+{% endblock %}
+
+
+{% block content %}
+    {% if game_username %}
+        <h3>Hello {{ game_username }}!!!</h3>
+    {% else %}
+        <h3>Hello Player!!!</h3>
+    {% endif %}
+    <hr>
+    <!-- display questions -->
+    {% if question %}
+        <h3>{{ question }}</h3>
+        <form action="/" method="post">
+            {% csrf_token %}
+            <div class="md-form" style="margin-left: 25px">
+                <input type="hidden" id="que_sequence" class="form-control" name="que_sequence" value="{{ question.sequence }}">
+                <input type="hidden" id="game_username" class="form-control" name="game_username" value="{{ game_username }}">
+                {% if question.question_type == '' %}
+                    <input type="text" id="game_username" class="form-control" name="game_username" required="">
+                    <label for="game_username">Game Userame</label>
+                {% endif %}
+                {% if question.question_type == 'radio' %}
+                    {% for opt in question.answer_set.all %}
+                        <div class="custom-control custom-radio">
+                            <input type="radio" class="custom-control-input" id="radio_{{opt.id}}" name="radios" value="{{ opt.id }}">
+                            <label class="custom-control-label" for="radio_{{opt.id}}">{{ opt.option }}</label>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                {% if question.question_type == 'checkbox' %}
+                    {% for opt in question.answer_set.all %}
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="{{opt.id}}" name="checkboxs_{{opt.id}}" value="{{ opt.id }}">
+                            <label class="custom-control-label" for="{{opt.id}}">{{ opt.option }}</label>
+                        </div>
+                        <br>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary btn-md" value="{% if next %}finish{% endif %}"> {% if next %} Next > {% else %} FINISH {% endif %}</button>
+    {% endif %}
+        </form>
+
+    <!-- display summery of all the current user -->
+    {% if summery %}
+        <h3>Game: {{date}}</h3>
+        <br>
+        {% for sum in summery %}
+            {% for key, value in sum.items %}
+                <h3> <b>Question:</b> {{ key }}</h3>
+                <h3> <b>Answer:</b> {{ value }}</h3>
+            {% endfor %}
+        {% endfor %}
+        <a href="/" class="btn btn-default">FINISH</a>
+    {% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+  function myClick() {
+    setTimeout(
+      function() {
+        $('#cover').css("z-index", "-99");
+      }, 3000);
+  }
+</script>
+{% endblock %}
